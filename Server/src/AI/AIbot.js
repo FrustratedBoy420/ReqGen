@@ -53,7 +53,7 @@ ${idea}
         content: prompt,
       },
     ],
-    model: "groq/compound",
+    model: "meta-llama/llama-prompt-guard-2-86m",
   });
 }
 
