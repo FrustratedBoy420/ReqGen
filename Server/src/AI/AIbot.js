@@ -5,7 +5,6 @@ import OpenAI from "openai";
 
 const main=async(idea)=> {
   const chatCompletion = await getGroqChatCompletion(idea);
-  // Print the completion returned by the LLM.
   const raw= (chatCompletion.choices[0]?.message?.content || "");
   try {
     return JSON.parse(raw)
@@ -15,7 +14,7 @@ const main=async(idea)=> {
 }
 async function getGroqChatCompletion(idea) {
   const prompt=`Return ONLY valid JSON.
-
+Imagine Yourself as senior Developer in company and you have to make this type of report now generate things in Detailed manner seem like it is well researched show things properly
 Do not include any explanation or text.
 
 Format:
@@ -53,7 +52,7 @@ ${idea}
         content: prompt,
       },
     ],
-    model: "meta-llama/llama-prompt-guard-2-86m",
+    model: "groq/compound",
   });
 }
 

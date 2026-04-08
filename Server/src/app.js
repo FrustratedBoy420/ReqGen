@@ -1,4 +1,5 @@
     import express from "express";
+    import cors from "cors";
     import generateideaplan from "./routes/auth.routes.js";
     import logger from "./utils/logger.js";
     import morgan from "morgan";
@@ -6,6 +7,10 @@
     const app = express();
 
     // middleware
+    app.use(cors({
+      origin: "http://localhost:5173",
+      credentials: true,
+    }));
     app.use(express.json());
 
     const morganFormat = ":method :url :status :response-time ms";

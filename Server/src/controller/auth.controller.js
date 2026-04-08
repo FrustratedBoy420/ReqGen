@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/Api-response.js";
 import { main } from "../AI/AIbot.js";
 import { asyncHandler } from "../utils/asynchandler.js";
 import { User } from "../models/user.model.js";
+import PDFDocument from "pdfkit"
 
 const generateAccessandRefreshToken=async (userID)=>{
     try {
@@ -31,8 +32,10 @@ const generateProjectPlan = asyncHandler(async (req, res) => {
 
     const result = await main(idea);
 
+
     const newProject = await Project.create(result);
-    newProject.createdBy=userId
+    
+    newProject.createdBy=userId;
     await User.findByIdAndUpdate(userId, {
       $push: { projectID: newProject._id }
     });
@@ -108,7 +111,8 @@ const login=asyncHandler(async (req,res) => {
     const loginUser=await User.findById(loginProfile._id).select("-password");
     const options={
         httpOnly:true,
-        secure:true
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax"
     }
 
     return res
@@ -137,7 +141,8 @@ const logout=asyncHandler(async(req,res)=>{
 
     const options={
         httpOnly:true,
-        secure:true
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax"
     }
 
     return res
@@ -154,4 +159,21 @@ const logout=asyncHandler(async(req,res)=>{
 })
 
 
-export {generateProjectPlan,registerUser,login,logout}
+const getUserProjects = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id).populate("projectID");
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(
+            200,
+            { projects: user.projectID },
+            "Projects fetched successfully"
+        ));
+});
+
+
+export {generateProjectPlan,registerUser,login,logout,getUserProjects}

@@ -1,49 +1,56 @@
 import { useState, useEffect } from "react"
-import { useAuth } from "../../contexts/AuthContext"
 import { useNavigate, Link } from "react-router-dom"
+import { useAuth } from "../../contexts/AuthContext"
 
-function Login() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+function Register() {
+  const [formData, setFormData] = useState({ fullName: "", username: "", email: "", password: "" })
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
-  const { loginUser, user } = useAuth()
+  const { registerUser, user } = useAuth()
 
   // redirect if already logged in
   useEffect(() => {
     if (user) navigate("/get-started", { replace: true })
   }, [user, navigate])
 
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value })
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
     setLoading(true)
     try {
-      await loginUser(email, password)
-      navigate("/get-started")
+      await registerUser(formData)
+      navigate("/login")
     } catch (err) {
-      setError(err.message || "Failed to log in")
+      setError(err.message || "Registration failed")
     } finally {
       setLoading(false)
     }
   }
 
+  const fields = [
+    { name: "fullName",  label: "Full Name", type: "text",     placeholder: "John Doe" },
+    { name: "username",  label: "Username",  type: "text",     placeholder: "johndoe" },
+    { name: "email",     label: "Email",     type: "email",    placeholder: "you@example.com" },
+    { name: "password",  label: "Password",  type: "password", placeholder: "••••••••" },
+  ]
+
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-gradient-to-br from-slate-50 via-white to-slate-100 px-4 py-12 sm:px-6">
       <div className="animate-scale-in w-full max-w-md">
 
-        {/* card */}
         <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-xl">
           {/* icon + title */}
           <div className="mb-6 text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-900 text-white shadow-lg">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
               </svg>
             </div>
-            <h1 className="text-2xl font-extrabold text-slate-900">Welcome back</h1>
-            <p className="mt-1 text-sm text-slate-500">Sign in to your ReqGen account</p>
+            <h1 className="text-2xl font-extrabold text-slate-900">Create your account</h1>
+            <p className="mt-1 text-sm text-slate-500">Start generating project plans today</p>
           </div>
 
           {/* error */}
@@ -57,29 +64,20 @@ function Login() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="mb-1.5 block text-xs font-semibold text-slate-600">Email address</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200 placeholder:text-slate-400"
-              />
-            </div>
-
-            <div>
-              <label className="mb-1.5 block text-xs font-semibold text-slate-600">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200 placeholder:text-slate-400"
-              />
-            </div>
+            {fields.map((f) => (
+              <div key={f.name}>
+                <label className="mb-1.5 block text-xs font-semibold text-slate-600">{f.label}</label>
+                <input
+                  type={f.type}
+                  name={f.name}
+                  value={formData[f.name]}
+                  onChange={handleChange}
+                  placeholder={f.placeholder}
+                  required
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200 placeholder:text-slate-400"
+                />
+              </div>
+            ))}
 
             <button
               type="submit"
@@ -92,16 +90,16 @@ function Login() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  Signing in…
+                  Creating account…
                 </>
-              ) : "Sign In"}
+              ) : "Create Account"}
             </button>
           </form>
 
           <p className="mt-5 text-center text-sm text-slate-500">
-            Don't have an account?{" "}
-            <Link to="/register" className="font-semibold text-slate-900 hover:underline">
-              Create one
+            Already have an account?{" "}
+            <Link to="/login" className="font-semibold text-slate-900 hover:underline">
+              Sign in
             </Link>
           </p>
         </div>
@@ -110,4 +108,4 @@ function Login() {
   )
 }
 
-export default Login
+export default Register

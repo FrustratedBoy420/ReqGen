@@ -1,10 +1,23 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { useAuth } from '../../contexts/AuthContext'
 
 function Header() {
+  const { user, logoutUser } = useAuth()
+  const navigate = useNavigate()
+  
   const navItems = [
-    { label: 'Home', to: '/' },,
+    { label: 'Home', to: '/' },
     { label: 'About', to: '/about' },
+    ...(user ? [
+      { label: 'Generate', to: '/get-started' },
+      { label: 'History', to: '/history' },
+    ] : []),
   ]
+
+  const handleLogout = async () => {
+    await logoutUser()
+    navigate('/')
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-gradient-to-r from-amber-50 via-white to-cyan-50/70 backdrop-blur">
@@ -42,18 +55,34 @@ function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <NavLink
-            to="/login"
-            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-100"
-          >
-            Login
-          </NavLink>
-          <NavLink
-            to="/get-started"
-            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
-          >
-            Get Started
-          </NavLink>
+          {user ? (
+            <>
+              <div className="hidden sm:block mr-2 text-sm font-semibold text-slate-700">
+                Hi, {user.username || user.fullName}
+              </div>
+              <button
+                onClick={handleLogout}
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-100"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <NavLink
+                to="/login"
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-100"
+              >
+                Login
+              </NavLink>
+              <NavLink
+                to="/register"
+                className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+              >
+                Register
+              </NavLink>
+            </>
+          )}
         </div>
       </div>
     </header>
