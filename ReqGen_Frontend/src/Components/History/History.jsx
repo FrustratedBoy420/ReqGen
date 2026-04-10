@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useNavigate, Link } from "react-router-dom"
-import { useAuth } from "../../contexts/AuthContext"
+import { useAuth } from "../../contexts/authContext"
 
 // ── helpers ─────────────────────────────────────────────────────────────────
 const formatCurrency = (n) =>
@@ -221,15 +221,7 @@ function History() {
   const { user, authFetch } = useAuth()
   const navigate = useNavigate()
 
-  useEffect(() => {
-    if (!user) {
-      navigate("/login")
-      return
-    }
-    fetchProjects()
-  }, [user])
-
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     setLoading(true)
     setError("")
     try {
@@ -242,7 +234,15 @@ function History() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [authFetch])
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/login")
+      return
+    }
+    fetchProjects()
+  }, [user, navigate, fetchProjects])
 
   const filtered = projects.filter((p) =>
     p.scope?.toLowerCase().includes(search.toLowerCase()) ||

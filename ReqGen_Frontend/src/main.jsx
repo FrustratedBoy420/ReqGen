@@ -9,7 +9,7 @@ import Get_Started from './Components/Get_Started/Get_Started.jsx';
 import Home from './Components/Home/Home.jsx';
 import About from './Components/About/About.jsx';
 import History from './Components/History/History.jsx';
-import { AuthProvider } from './contexts/AuthContext.jsx';
+import { AuthProvider } from './contexts/authContext.jsx';
 
 const routers=createBrowserRouter(
   createRoutesFromElements(
