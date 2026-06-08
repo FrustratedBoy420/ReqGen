@@ -6,9 +6,19 @@
     import cookieParser from "cookie-parser";
     const app = express();
 
-    // middleware
+    const allowedOrigins = [
+      "http://localhost:5173",
+      "https://req-gen-83ef.vercel.app"
+    ];
+
     app.use(cors({
-      origin: "https://req-gen-83ef.vercel.app/",
+      origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
       credentials: true,
     }));
     app.use(express.json());
