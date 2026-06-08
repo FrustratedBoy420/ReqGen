@@ -50,4 +50,14 @@
     // main route
     app.use("/api", generateideaplan);
 
+    // Global Error Handler Middleware
+    app.use((err, req, res, next) => {
+      const statusCode = err.statuscode || err.statusCode || 500;
+      res.status(statusCode).json({
+        success: false,
+        message: err.message || "Internal Server Error",
+        errors: err.errors || []
+      });
+    });
+
     export default app;
